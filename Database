@@ -1,0 +1,187 @@
+-- Create database
+CREATE DATABASE CO2102ProjectEx3;
+
+-- Use CO2102ProjectEx3
+USE CO2102ProjectEx3;
+
+-- Create office table
+CREATE TABLE office (
+	off_code INT,
+	off_city VARCHAR(20) NOT NULL,
+	off_phonenumber NUMERIC(11) NOT NULL,
+	off_addressline1 VARCHAR(30) NOT NULL,
+	off_addressline2 VARCHAR(30) NOT NULL,
+	off_county VARCHAR(20) NOT NULL,
+	off_country VARCHAR(20) NOT NULL,
+	off_postalcode VARCHAR(10) NOT NULL,
+	off_territory VARCHAR(30) NOT NULL,
+CONSTRAINT pk_office PRIMARY KEY (off_code)
+);
+
+-- Create employee table
+CREATE TABLE employee (
+	emp_number VARCHAR(5),
+	emp_firstname VARCHAR(20) NOT NULL,
+	emp_lastname VARCHAR(20) NOT NULL,
+	emp_extension INT NOT NULL,
+	emp_email VARCHAR(30) NOT NULL,
+	off_code INT NOT NULL,
+	emp_jobtitle VARCHAR(30) NOT NULL,
+	emp_boss VARCHAR(20) NOT NULL,
+CONSTRAINT pk_employee PRIMARY KEY (emp_number),
+CONSTRAINT fk_employee_office FOREIGN KEY (off_code) REFERENCES office (off_code)
+);
+
+-- Create customer table
+CREATE TABLE customer (
+	cust_number VARCHAR(5),
+	cust_firstname VARCHAR(30) NOT NULL,
+	cust_lastname VARCHAR(30)NOT NULL,
+	cust_phonenumber NUMERIC(11) NOT NULL,
+	cust_addressline1 VARCHAR(30) NOT NULL,
+	cust_addressline2 VARCHAR(30) NOT NULL,
+	cust_city VARCHAR(20) NOT NULL,
+	cust_county VARCHAR(20) NOT NULL,
+	cust_postalcode VARCHAR(10) NOT NULL,
+	cust_country VARCHAR(20) NOT NULL,
+	sales_amount DECIMAL(10, 2) NOT NULL,
+	emp_number VARCHAR(5) NOT NULL,
+	cust_creditlimitnumber DECIMAL (10, 2) NOT NULL,
+CONSTRAINT pk_customer PRIMARY KEY (cust_number),
+CONSTRAINT fk_customer_employee FOREIGN KEY (emp_number) REFERENCES employee (emp_number)
+);
+
+-- Create payment table
+CREATE TABLE payment (
+	cust_number VARCHAR(5) NOT NULL,
+	cheque_number INT,
+	payment_date DATE NOT NULL,
+	amount_paid DECIMAL(10, 2) NOT NULL,
+CONSTRAINT pk_payment PRIMARY KEY (cheque_number),
+CONSTRAINT fk_payment_customer FOREIGN KEY (cust_number) REFERENCES customer (cust_number)
+);
+
+-- Create prescriptionorders table
+CREATE TABLE prescriptionorders (
+	pord_number VARCHAR(5),
+	pord_date DATE NOT NULL,
+	required_date DATE NOT NULL,
+	shipped_date DATE NOT NULL,
+	pord_status VARCHAR(30) NOT NULL,
+	comments VARCHAR(50) NOT NULL,
+	cust_number VARCHAR(5) NOT NULL,
+CONSTRAINT pk_prescriptionorders PRIMARY KEY (pord_number),
+CONSTRAINT fk_prescriptionorders_customer FOREIGN KEY (cust_number) REFERENCES customer (cust_number)
+);
+
+-- Create product table
+CREATE TABLE product (
+	prod_code INT,
+	prod_name VARCHAR(30) NOT NULL,
+	prod_line VARCHAR(30) NOT NULL,
+	prod_scaleweight DECIMAL(5, 2) NOT NULL,
+	prod_vendor VARCHAR(30) NOT NULL,
+	prod_description VARCHAR(100) NOT NULL,
+	prod_quantitystock INT NOT NULL, 
+	prod_buyingprice DECIMAL(10, 2) NOT NULL,
+	prod_msrp DECIMAL(10, 2) NOT NULL,
+CONSTRAINT pk_product PRIMARY KEY (prod_code)
+);
+
+-- Create productline table
+CREATE TABLE productline (
+	productline_text VARCHAR(20),
+	prod_description VARCHAR(100) NOT NULL,
+	website VARCHAR(100) NOT NULL,
+	prod_image VARCHAR(100) NOT NULL,
+CONSTRAINT pk_productline PRIMARY KEY (productline_text)
+);
+
+-- Create orders table
+CREATE TABLE orders (
+	pord_number VARCHAR(5) NOT NULL,
+	prod_code INT NOT NULL,
+	quantity_ordered INT NOT NULL,
+	price DECIMAL(10, 2) NOT NULL,
+	orders_linenumber INT NOT NULL,
+CONSTRAINT fk_orders_prescriptionorders FOREIGN KEY (pord_number) REFERENCES prescriptionorders (pord_number),
+CONSTRAINT fk_orders_product FOREIGN KEY (prod_code) REFERENCES product (prod_code)
+);
+
+-- Insert values into office
+INSERT INTO office 
+VALUES 
+(1, 'London', '01268444470', '13 Kensington Avenue', 'Kensington Road', 'Londonshire', 'UK', 'SW7 36F', 'Londonstate'),
+(2, 'Liverpool', '01272455471', '26 Everton Avenue', 'Everton Road', 'Livershire', 'UK', 'L5 4TQ', 'Liverstate'),
+(3, 'Birmingham', '01235411427', '38 Brookfield Avenue', 'Brookfield Road', 'Birnmingshire', 'UK', 'B1 3RH', 'Birmingstate'),
+(4, 'Manchester', '01291484493', '45 Solton Avenue', 'Solton Road', 'Manshire', 'UK', 'M14 4FS', 'Manstate');
+
+-- Insert values into employee
+INSERT INTO employee
+VALUES 
+('emp11', 'Sarah', 'Dezayi', 44, 'sd545@student.le.ac.uk', 1, 'Accountant', 'Jim'),
+('emp22', 'Aya', 'Said', 44, 'ay216@student.le.ac.uk', 2, 'Broker', 'Sally'),
+('emp33', 'Kalliy', 'Ali', 44, 'ka216@student.le.ac.uk', 3, 'Audit', 'Jane'),
+('emp44', 'Aria', 'Shatri', 44, 'ay216@student.le.ac.uk', 4, 'Chef', 'Roy');
+
+-- Insert values into customer
+INSERT INTO customer 
+VALUES 
+('cus19', 'Kaylee', 'Manangan', 07413696333, '1 Moulton Avenue', 'Moulton Road', 'London', 'Londonshire', 'LO 124', 'UK', 74659671.53, 'emp11', 45780923.21),
+('cus28', 'Melissa', 'Pasquali', 07521696003, '2 Day Avenue', 'Day Road', 'Slough', 'Berkshire', 'S5 578', 'UK', 61259121.22, 'emp22', 47280103.15),
+('cus35', 'Samantha', 'White', 07233669222, '3 Selly Avenue', 'Selly Road', 'Leyton', 'Leytonshire', 'LE3 5K7', 'UK', 92167717.53, 'emp33', 91756911.71),
+('cus41', 'Ocean', 'Campbell', 07734892512, '4 Bench Avenue', 'Bench Road', 'Bromley', 'Bromleyshire', 'BE4 217', 'UK', 11166617.07, 'emp44', 50809227.33);
+
+-- Insert values into payment
+INSERT INTO payment
+VALUES 
+('cus19', 11111, '21-01-03', 56093203.12),
+('cus28', 22222, '15-04-12', 21093003.84),
+('cus35', 33333, '30-07-22', 88099993.09),
+('cus41', 44444, '19-09-23', 33710988.77);
+
+-- Insert values into prescriptionorders
+INSERT INTO prescriptionorders
+VALUES 
+('pro10', '2008-09-25', '2018-07-21', '2009-01-09', 'Ready', 'Once a day', 'cus19'),
+('pro20', '2001-06-03', '2030-11-09', '2026-08-16', 'Delivered', 'Twice a day', 'cus28'),
+('pro30', '2011-01-16', '2021-10-10', '2014-07-20', 'Collected', 'Three times a day', 'cus35'),
+('pro40', '2012-03-19', '2018-04-23', '2014-12-10', 'Processing', 'Four times a day', 'cus41');
+
+-- Insert values into product
+INSERT INTO product
+VALUES 
+(100, 'Ibuprofen', 'Boots', 543.12, 'GP', 'Headache', 101, 83216544.01, 67012738.21),
+(204, 'Aspirin', 'Superdrug', 451.92, 'GSK', 'Muscle Ache', 202, 71835207.88, 90752177.52),
+(301, 'Paracetamol', 'Savers', 777.11, 'Patheon', 'Tooth Ache', 303, 90711111.81, 40912690.22),
+(444, 'Piritize', 'PharmacyPlus', 814.55, 'PCI', 'Hayfever', 404, 66666666.11, 80932174.11);
+
+-- Insert values into productline
+INSERT INTO productline
+VALUES 
+('Vaseline', 'Balm', 'https://www.vaseline.com/us/en', 'image1'),
+('Sudocrem', 'Cream', 'https://www.sudocrem.co.uk/', 'image2'),
+('Vicks', 'VapoRub', 'https://www.vicks.co.uk/', 'image3'),
+('Steroid', 'SteroidComp', 'https://www.steroidcomp.co.uk/', 'image4');
+
+-- Insert values into orders
+INSERT INTO orders
+VALUES
+('pro10', 100, 52, 50999999.11, 25),
+('pro20', 204, 1000, 90753355.21, 67),
+('pro30', 301, 90, 71459077.22, 80),
+('pro40', 444, 2755, 80932111.71, 2);
+
+-- Create Customer_Order_Restricted_Info views table
+CREATE VIEW Customer_Order_Restricted_Info AS
+SELECT
+    c.cust_number AS customer_id,
+    CONCAT(c.cust_firstname, ' ', c.cust_lastname) AS full_name,
+    CONCAT(c.cust_addressline1, ' ', c.cust_addressline2, ' ', c.cust_postalcode, ' ', c.cust_country) AS full_address,
+    po.pord_status AS order_status,
+    o.quantity_ordered AS quant_ordered
+FROM customer c
+INNER JOIN prescriptionorders po ON c.cust_number = po.cust_number
+INNER JOIN orders o ON po.pord_number = o.pord_number
+WHERE c.cust_creditlimitnumber > 1000
+AND po.shipped_date < '2010-01-01';
